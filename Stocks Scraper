@@ -1,0 +1,813 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jul 12 21:13:14 2023
+
+@author: Manish Kolla
+"""
+
+#Importing all modules required.
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+#import mariadb
+import mysql.connector
+import sys
+from selenium.common.exceptions import NoSuchElementException
+from datetime import date,datetime
+from datetime import timedelta
+import time
+from selenium.webdriver.chrome.options import Options
+driver = webdriver.Chrome(executable_path='***Webdriver Location***')
+try:
+    connection = mysql.connector.connect(
+        user="root",
+        password="*******",
+        host="localhost",
+        port=3306,
+        database="stocks_data",
+        charset="utf8mb3",
+    )
+except:
+    print("Error connecting to MySQL Platform:")
+    sys.exit(1)
+
+# Getting DB cursor
+cursor = connection.cursor()
+apple_url="https://finance.yahoo.com/quote/AAPL/history?p=AAPL"
+tesla_url="https://finance.yahoo.com/quote/TSLA/history?p=TSLA"
+meta_url="https://finance.yahoo.com/quote/META/history?p=META"
+microsoft_url="https://finance.yahoo.com/quote/MSFT/history?p=MSFT"
+netflix_url="https://finance.yahoo.com/quote/NFLX/history?p=NFLX"
+amazon_url="https://finance.yahoo.com/quote/AMZN/history?p=AMZN"
+google_url="https://finance.yahoo.com/quote/GOOG/history?p=GOOG"
+ibm_url="https://finance.yahoo.com/quote/IBM/history?p=IBM"
+adobe_url="https://finance.yahoo.com/quote/ADBE/history?p=ADBE"
+dell_url="https://finance.yahoo.com/quote/DELL/history?p=DELL"
+uber_url="https://finance.yahoo.com/quote/UBER/history?p=UBER"
+'''
+****************
+Code to scrape the data in Apple stocks
+****************
+'''
+def apple(apple_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS apple(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+
+    driver.get(apple_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO apple(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully############")
+    print("Apple DONE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")  
+apple(apple_url)
+
+'''
+****************
+Code to Scrape the data in Tesla 
+****************
+'''
+def tesla(tesla_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS tesla(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    
+
+    driver.get(tesla_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO tesla(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("TESLA DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+tesla(tesla_url)
+
+'''
+*****************
+Code to scrape the data in Meta stocks
+****************
+'''
+
+def meta(meta_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS meta(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    driver.get(meta_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO meta(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("META DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+meta(meta_url)
+
+'''
+***************************
+code to scrape Microsoft data
+***************************
+'''
+
+def microsoft(microsoft_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS microsoft(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    driver.get(microsoft_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO microsoft(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("MICROSOFT DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+microsoft(microsoft_url)
+
+'''
+*************************
+Code to scrape Netflix data
+************************
+'''
+
+def netflix(netflix_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS netflix(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    
+
+    driver.get(netflix_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO netflix(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("NETFLIX DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+netflix(netflix_url)
+
+'''
+*************************
+Code to scrape Amazon data
+************************
+'''
+
+def amazon(amazon_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS amazon(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    
+    driver.get(amazon_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO amazon(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("AMAZON DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+amazon(amazon_url)
+
+'''
+*************************
+Code to scrape Google data
+************************
+'''
+
+def google(google_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS google(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    
+
+    driver.get(google_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO google(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("GOOGLE DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+google(google_url)
+
+'''
+*************************
+Code to scrape IBM data
+************************
+'''
+
+def ibm(ibm_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS ibm(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    
+
+    driver.get(ibm_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO ibm(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("IBM DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+ibm(ibm_url)
+
+
+'''
+*************************
+Code to scrape ADOBE data
+************************
+'''
+
+def adobe(adobe_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS adobe(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    
+
+    driver.get(adobe_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO adobe(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("ADOBE DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+adobe(adobe_url)
+
+'''
+*************************
+Code to scrape DELL data
+************************
+'''
+
+def dell(dell_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS dell(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    
+
+    driver.get(dell_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO dell(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("DELL DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+dell(dell_url)
+
+'''
+*************************
+Code to scrape UBER data
+************************
+'''
+
+def uber(uber_url):
+    command1 = """
+    CREATE TABLE IF NOT EXISTS uber(
+        Date TEXT,
+        Open LONGTEXT,
+        High LONGTEXT,
+        Low LONGTEXT,
+        Close LONGTEXT,
+        AdjClose LONGTEXT,
+        Volume LONGTEXT
+    ) DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    """
+    
+    cursor.execute(command1)
+    
+    
+
+    driver.get(uber_url)
+    
+    #current_price=driver.find_element(By.XPATH, "//*[@id='quote-header-info']/div[3]/div[1]/div[1]/fin-streamer[1]").text
+    #print(current_price)
+    
+    
+    dates=[]
+    open=[]
+    high=[]
+    low=[]
+    close=[]
+    adjclose=[]
+    volume=[]
+    table_data=driver.find_elements(By.CLASS_NAME, "BdT")
+    for row in table_data:
+        table_row=row.find_elements(By.TAG_NAME, "td")
+        stock_values=[]
+        for td in table_row:
+                    stock_values.append(td.text)
+                    if len(stock_values)==7: 
+                        dates.append(stock_values[0])
+                        open.append(stock_values[1])
+                        high.append(stock_values[2])
+                        low.append(stock_values[3])
+                        close.append(stock_values[4])
+                        adjclose.append(stock_values[5])
+                        volume.append(stock_values[6])
+                        stock_values.clear()
+                    else:
+                        pass
+    for data in range(len(dates)):
+        Date=dates[data]
+        Open=open[data]
+        High=high[data]
+        Low=low[data]
+        Close=close[data]
+        AdjClose=adjclose[data]
+        Volume=volume[data]
+        
+        cursor.execute("INSERT INTO uber(Date,Open,High,Low,Close,AdjClose,Volume ) VALUES (%s,%s,%s,%s,%s,%s,%s)" ,  (Date,Open,High,Low,Close,AdjClose,Volume))
+        connection.commit()
+        print("######Data Inserted Successfully#########")
+    print("UBER DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    
+uber(uber_url)
+
+
+driver.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
